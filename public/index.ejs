@@ -87,6 +87,11 @@ function correlation(){
     success: function( data ){
       var cp = []; cn = [];
       var table = '<table border="1">';
+      table += '<tr bgcolor="#ffffcc">';
+      for( var i = 0; i < shifts.length; i ++ ){
+        table += ( '<th>' + shifts[i] + '</th>' );
+      }
+      table += '</tr>';
 
       for( var i = 0; i < data.length; i ++ ){
         var tr = '<tr>';
