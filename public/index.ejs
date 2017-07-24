@@ -61,10 +61,8 @@ $(function(){
 
   table += '</table>';
   $('#table').html( table );
+  correlation();
 
-  $('#correlation').click( function(){
-    correlation();
-  });
   $('input[type=range]').click( function(){
     correlation();
   });
@@ -155,7 +153,7 @@ function correlation(){
 </head>
 <body>
 <div id="table"></div>
-<input type="button" id="correlation" value="correlation"/>
+<br/>
 <div id="result"></div>
 <div id="chart"></div>
 </body>
