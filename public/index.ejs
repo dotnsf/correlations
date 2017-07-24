@@ -51,19 +51,24 @@ $(function(){
     tr += '</tr>';
     table += tr;
   }
+  table += '</table>';
+  $('#table').html( table );
 
-  table += '<tr><td>&nbsp;</td>';
+  table = '<table border="1">';
+  table += '<thead><tr bgcolor="#ffffcc">';
   for( var i = 0; i < cols.length; i ++ ){
-    var td = '<td><input type="range" id="shift' + i + '" name="shift' + i + '" min="-10" max="10" value="0"/></td>';
+    var td = '<th><input type="range" id="shift' + i + '" name="shift' + i + '" min="-10" max="10" value="0"/></th>';
     table += td;
   }
   table += '</tr>';
+  table += '</thead><tbody id="tbody"></tbody></table>';
+  $('#result').html( table );
 
-  table += '</table>';
-  $('#table').html( table );
   correlation();
 
   $('input[type=range]').click( function(){
+    var t = $(this);
+console.log( t );
     correlation();
   });
 });
@@ -71,9 +76,16 @@ $(function(){
 function correlation(){
   var shifts = [];
   var ranges = $('input[type=range]');
-  for( var i = 0, rowTotal = ranges.length; i < rowTotal; i ++ ){
-    var v = $(ranges[i]).val();
-    shifts.push( v );
+  var rowTotal = ranges.length;
+  if( rowTotal > 0 ){
+    for( var i = 0; i < rowTotal; i ++ ){
+      var v = $(ranges[i]).val();
+      shifts.push( v );
+    }
+  }else{
+    for( var i = 0; i < values.length; i ++ ){
+      shifts.push( 0 );
+    }
   }
 
   var postdata = { 'values': values, 'shifts': shifts };
@@ -84,10 +96,9 @@ function correlation(){
     data: postdata,
     success: function( data ){
       var cp = []; cn = [];
-      var table = '<table border="1">';
-      table += '<tr bgcolor="#ffffcc">';
+      var table = '<tr bgcolor="#ffffcc">';
       for( var i = 0; i < shifts.length; i ++ ){
-        table += ( '<th>' + shifts[i] + '</th>' );
+        table += ( '<th>' + ( shifts[i] > 0 ) ? '+' : '' ) + shifts[i] + '</th>' );
       }
       table += '</tr>';
 
@@ -116,8 +127,7 @@ function correlation(){
         tr += '</tr>';
         table += tr;
       }
-      table += '</table>';
-      $('#result').html( table );
+      $('#tbody').html( table );
 
       //. 相関関係のあるものだけを取り出す
       var list = [];
