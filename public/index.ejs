@@ -1,0 +1,158 @@
+<html>
+<head>
+<title>CSV</title>
+<script type="text/javascript" src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+<script type="text/javascript" src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script type="text/javascript">
+var values = [
+ [
+  <%= values[0][0] %>
+  <% for( var j = 1; j < values[0].length; j ++ ){ %>
+  ,<%= values[0][j] %>
+  <% } %>
+ ]
+<% for( var i = 1; i < values.length; i ++ ){ %>
+ ,[
+  <%= values[i][0] %>
+  <% for( var j = 1; j < values[i].length; j ++ ){ %>
+  ,<%= values[i][j] %>
+  <% } %>
+ ]
+<% } %>
+];
+var cols = [
+"<%= cols[0] %>"
+<% for( var i = 1; i < cols.length; i ++ ){ %>
+,"<%= cols[i] %>"
+<% } %>
+];
+var rows = [
+"<%= rows[0] %>"
+<% for( var i = 1; i < rows.length; i ++ ){ %>
+,"<%= rows[i] %>"
+<% } %>
+];
+
+$(function(){
+  var table = '<table border="1">';
+
+  var tr = '<tr><th>#</th>';
+  for( var i = 0; i < cols.length; i ++ ){
+    tr += ( '<th>' + cols[i] + '</th>' );
+  }
+  tr += '</tr>';
+  table += tr;
+
+  for( var i = 0; i < rows.length; i ++ ){
+    tr = '<tr><th>' + rows[i] + '</th>';
+    for( var j = 0; j < cols.length; j ++ ){
+      tr += ( '<td>' + values[j][i] + '</td>' );
+    }
+    tr += '</tr>';
+    table += tr;
+  }
+
+  table += '<tr><td>&nbsp;</td>';
+  for( var i = 0; i < cols.length; i ++ ){
+    var td = '<td><input type="range" id="shift' + i + '" name="shift' + i + '" min="-10" max="10" value="0"/></td>';
+    table += td;
+  }
+  table += '</tr>';
+
+  table += '</table>';
+  $('#table').html( table );
+
+  $('#correlation').click( function(){
+    correlation();
+  });
+  $('input[type=range]').click( function(){
+    correlation();
+  });
+});
+
+function correlation(){
+  var shifts = [];
+  var ranges = $('input[type=range]');
+  for( var i = 0, rowTotal = ranges.length; i < rowTotal; i ++ ){
+    var v = $(ranges[i]).val();
+    shifts.push( v );
+  }
+
+  var postdata = { 'values': values, 'shifts': shifts };
+  $.ajax({
+    type: 'POST',
+    dataType: 'json',
+    url: './correlation',
+    data: postdata,
+    success: function( data ){
+      var cp = []; cn = [];
+      var table = '<table border="1">';
+
+      for( var i = 0; i < data.length; i ++ ){
+        var tr = '<tr>';
+        for( var j = 0; j < data[i].length; j ++ ){
+          var bgcolor = '#ffffff';
+          if( i == j ){
+            bgcolor = '#cccccc';
+            data[i][j] = '-';
+          }else if( data[i][j] > 0.8 ){
+            //. i と j には相関関係あり
+            bgcolor = '#ffcccc';
+            if( i < j ){
+              cp.push( [ i, j ] );
+            }
+          }else if( data[i][j] < -0.8 ){
+            //. i と j には逆相関関係あり
+            bgcolor = '#ccccff';
+            if( i < j ){
+              cn.push( [ i, j ] );
+            }
+          }
+          tr += ( '<td bgcolor="' + bgcolor + '">' + data[i][j] + '</td>' );
+        }
+        tr += '</tr>';
+        table += tr;
+      }
+      table += '</table>';
+      $('#result').html( table );
+
+      //. 相関関係のあるものだけを取り出す
+      var list = [];
+      for( var i = 0; i < cp.length; i ++ ){
+        var p = cp[i];
+        if( list.indexOf( p[0] ) == -1 ){
+          list.push( p[0] );
+        }
+        if( list.indexOf( p[1] ) == -1 ){
+          list.push( p[1] );
+        }
+      }
+      for( var i = 0; i < cn.length; i ++ ){
+        var p = cn[i];
+        if( list.indexOf( p[0] ) == -1 ){
+          list.push( p[0] );
+        }
+        if( list.indexOf( p[1] ) == -1 ){
+          list.push( p[1] );
+        }
+      }
+
+      console.log( '#list = ' + list.length );
+      if( list.length > 0 ){
+      }
+    },
+    error: function( XMLHttpRequest, textStatus, errorThrown ){
+      console.log( textStatus + ": " + errorThrown );
+    }
+  });
+}
+</script>
+</head>
+<body>
+<div id="table"></div>
+<input type="button" id="correlation" value="correlation"/>
+<div id="result"></div>
+<div id="chart"></div>
+</body>
+</html>
+
