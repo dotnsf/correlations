@@ -44,7 +44,7 @@ $(function(){
   table += tr;
 
   for( var i = 0; i < rows.length; i ++ ){
-    tr = '<tr><th>' + rows[i] + '</th>';
+    var tr = '<tr><th>' + rows[i] + '</th>';
     for( var j = 0; j < cols.length; j ++ ){
       tr += ( '<td>' + values[j][i] + '</td>' );
     }
@@ -57,6 +57,12 @@ $(function(){
   table = '<table border="1">';
   table += '<thead><tr bgcolor="#ffffcc">';
   for( var i = 0; i < cols.length; i ++ ){
+    var th = '<th>' + cols[i] + '</th>';
+    table += th;
+  }
+  table += '</tr>';
+  table += '<tr bgcolor="#ffffcc">';
+  for( var i = 0; i < cols.length; i ++ ){
     var td = '<th><input type="range" id="shift' + i + '" name="shift' + i + '" min="-10" max="10" value="0"/></th>';
     table += td;
   }
@@ -68,7 +74,8 @@ $(function(){
 
   $('input[type=range]').click( function(){
     var t = $(this);
-console.log( t );
+    var idx = ( t.context.id ).substring( 5 ); //. shiftX
+console.log( idx );
     correlation();
   });
 });
@@ -98,7 +105,7 @@ function correlation(){
       var cp = []; cn = [];
       var table = '<tr bgcolor="#ffffcc">';
       for( var i = 0; i < shifts.length; i ++ ){
-        table += ( '<th>' + ( shifts[i] > 0 ) ? '+' : '' ) + shifts[i] + '</th>' );
+        table += ( '<th>' + ( ( shifts[i] > 0 ) ? '+' : '' ) + shifts[i] + '</th>' );
       }
       table += '</tr>';
 
