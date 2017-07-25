@@ -1,6 +1,7 @@
 <html>
 <head>
 <title>CSV</title>
+<script type="text/javascript" src="//cdn.plot.ly/plotly-latest.min.js"></script>
 <script type="text/javascript" src="//code.jquery.com/jquery-2.2.4.min.js"></script>
 <script type="text/javascript" src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script type="text/javascript">
@@ -34,7 +35,8 @@ var rows = [
 ];
 
 $(function(){
-  var table = '<table border="1">';
+  //. CSV 読み込み結果をテーブル表記
+  var table = '<table id="csvtable" border="1">';
 
   var tr = '<tr><th>#</th>';
   for( var i = 0; i < cols.length; i ++ ){
@@ -54,14 +56,15 @@ $(function(){
   table += '</table>';
   $('#table').html( table );
 
-  table = '<table border="1">';
-  table += '<thead><tr bgcolor="#ffffcc">';
+  //. 相関関係をテーブル表記
+  table = '<table id="correlationtable" border="1">';
+  table += '<thead><tr bgcolor="#ffffcc"><th></th>';
   for( var i = 0; i < cols.length; i ++ ){
     var th = '<th>' + cols[i] + '</th>';
     table += th;
   }
   table += '</tr>';
-  table += '<tr bgcolor="#ffffcc">';
+  table += '<tr bgcolor="#ffffcc"><th></th>';
   for( var i = 0; i < cols.length; i ++ ){
     var td = '<th><input type="range" id="shift' + i + '" name="shift' + i + '" min="-10" max="10" value="0"/></th>';
     table += td;
@@ -70,12 +73,23 @@ $(function(){
   table += '</thead><tbody id="tbody"></tbody></table>';
   $('#result').html( table );
 
+  //. 2D チャート
+  var figure = { data: [], layout: { title: "csv chart" } };
+  for( var i = 0; i < values.length; i ++ ){
+    var c = { x: rows, y: values[i], name: cols[i] };
+    figure.data.push( c );
+  }
+  Plotly.newPlot( 'chart2d', figure.data, figure.layout );
+
+  //. 相関関係調査
   correlation();
 
+  //. スライダー変更イベント毎に相関関係を再計算
   $('input[type=range]').click( function(){
     var t = $(this);
-    var idx = ( t.context.id ).substring( 5 ); //. shiftX
-console.log( idx );
+    var idx = ( t.context.id ).substring( 5 ); //. 'shiftX' の X 部分を取り出す
+    //console.log( idx ); //. X
+
     correlation();
   });
 });
@@ -103,7 +117,7 @@ function correlation(){
     data: postdata,
     success: function( data ){
       var cp = []; cn = [];
-      var table = '<tr bgcolor="#ffffcc">';
+      var table = '<tr bgcolor="#ffffcc"><th></th>';
       for( var i = 0; i < shifts.length; i ++ ){
         table += ( '<th>' + ( ( shifts[i] > 0 ) ? '+' : '' ) + shifts[i] + '</th>' );
       }
@@ -111,6 +125,7 @@ function correlation(){
 
       for( var i = 0; i < data.length; i ++ ){
         var tr = '<tr>';
+        tr += ( '<th bgcolor="#ffffcc">' + cols[i] + '</th>' );
         for( var j = 0; j < data[i].length; j ++ ){
           var bgcolor = '#ffffff';
           if( i == j ){
@@ -170,9 +185,10 @@ function correlation(){
 </head>
 <body>
 <div id="table"></div>
+<div id="chart2d" style="width:80%;height:60%"></div>
 <br/>
 <div id="result"></div>
-<div id="chart"></div>
+<div id="chart3d"></div>
 </body>
 </html>
 
