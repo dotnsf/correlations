@@ -90,11 +90,11 @@ $(function(){
     var idx = ( t.context.id ).substring( 5 ); //. 'shiftX' の X 部分を取り出す
     //console.log( idx ); //. X
 
-    correlation();
+    correlation( idx );
   });
 });
 
-function correlation(){
+function correlation( index ){ //. 初回は index == undefined
   var shifts = [];
   var ranges = $('input[type=range]');
   var rowTotal = ranges.length;
@@ -172,8 +172,62 @@ function correlation(){
         }
       }
 
-      console.log( '#list = ' + list.length );
       if( list.length > 0 ){
+        //. 関連チャート
+        var t = 2 * Math.PI / list.length;
+        var x = [], y = [], text = [];
+        for( var i = 0; i < list.length; i ++ ){
+          x.push( Math.cos( Math.PI / 2 + i * t ) );
+          y.push( Math.sin( Math.PI / 2 + i * t ) );
+          text.push( cols[i] );
+        }
+        var trace = {
+          x: x,
+          y: y,
+          mode: 'markers',
+          type: 'scatter',
+          name: 'Relation Chart',
+          text: text,
+          marker: { size: 30, color: '#ff00ff' }
+        };
+
+        var chartdata = [ trace ];
+
+        for( var i = 0; i < cp.length; i ++ ){
+          var p = cp[i];
+          //. p[x] は list[] の何番目に入っているか？
+          var i0 = list.indexOf( p[0] );
+          var i1 = list.indexOf( p[1] );
+          chartdata.push( {
+            x: [ Math.cos( Math.PI / 2 + i0 * t ), Math.cos( Math.PI / 2 + i1 * t ) ],
+            y: [ Math.sin( Math.PI / 2 + i0 * t ), Math.sin( Math.PI / 2 + i1 * t ) ],
+            mode: 'lines',
+            line: { color: '#ff0000' }
+          } );
+        }
+        for( var i = 0; i < cn.length; i ++ ){
+          var p = cn[i];
+          var i0 = list.indexOf( p[0] );
+          var i1 = list.indexOf( p[1] );
+          chartdata.push( {
+            x: [ Math.cos( Math.PI / 2 + i0 * t ), Math.cos( Math.PI / 2 + i1 * t ) ],
+            y: [ Math.sin( Math.PI / 2 + i0 * t ), Math.sin( Math.PI / 2 + i1 * t ) ],
+            mode: 'lines',
+            line: { color: '#0000ff' }
+          } );
+        }
+
+console.log( chartdata );
+
+        var chartlayout = {
+          xaxis: { range: [ -1.5, 1.5 ] },
+          yaxis: { range: [ -1.5, 1.5 ] },
+          title: 'Relation Chart'
+        };
+
+        Plotly.newPlot( 'relchart', chartdata, chartlayout );
+      }else{
+        $('#relchart').html( '' );
       }
     },
     error: function( XMLHttpRequest, textStatus, errorThrown ){
@@ -188,7 +242,7 @@ function correlation(){
 <div id="chart2d" style="width:80%;height:60%"></div>
 <br/>
 <div id="result"></div>
-<div id="chart3d"></div>
+<div id="relchart"></div>
 </body>
 </html>
 
