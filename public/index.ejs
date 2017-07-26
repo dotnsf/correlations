@@ -179,16 +179,17 @@ function correlation( index ){ //. 初回は index == undefined
         var t = 2 * Math.PI / list.length;
         var x = [], y = [], text = [];
         for( var i = 0; i < list.length; i ++ ){
-          x.push( Math.cos( Math.PI / 2 + i * t ) );
-          y.push( Math.sin( Math.PI / 2 + i * t ) );
-          text.push( cols[i] );
+          var xy = getXY( index, i, t );
+          x.push( xy[0] );
+          y.push( xy[1] );
+          text.push( cols[list[i]] );
         }
         var trace = {
           x: x,
           y: y,
           mode: 'markers',
           type: 'scatter',
-          name: 'Relation Chart',
+          name: 'Relation Map',
           text: text,
           marker: { size: 50, color: '#ff00ff' }
         };
@@ -201,9 +202,11 @@ function correlation( index ){ //. 初回は index == undefined
           //. p[x] は list[] の何番目に入っているか？
           var i0 = list.indexOf( p[0] );
           var i1 = list.indexOf( p[1] );
+          var xy0 = getXY( index, i0, t );
+          var xy1 = getXY( index, i1, t );
           chartdata.push( {
-            x: [ Math.cos( Math.PI / 2 + i0 * t ), Math.cos( Math.PI / 2 + i1 * t ) ],
-            y: [ Math.sin( Math.PI / 2 + i0 * t ), Math.sin( Math.PI / 2 + i1 * t ) ],
+            x: [ xy0[0], xy1[0] ],
+            y: [ xy0[1], xy1[1] ],
             mode: 'lines',
             line: { color: '#ff0000', width: w }
           } );
@@ -213,9 +216,11 @@ function correlation( index ){ //. 初回は index == undefined
           var w = cnw[i];
           var i0 = list.indexOf( p[0] );
           var i1 = list.indexOf( p[1] );
+          var xy0 = getXY( index, i0, t );
+          var xy1 = getXY( index, i1, t );
           chartdata.push( {
-            x: [ Math.cos( Math.PI / 2 + i0 * t ), Math.cos( Math.PI / 2 + i1 * t ) ],
-            y: [ Math.sin( Math.PI / 2 + i0 * t ), Math.sin( Math.PI / 2 + i1 * t ) ],
+            x: [ xy0[0], xy1[0] ],
+            y: [ xy0[1], xy1[1] ],
             mode: 'lines',
             line: { color: '#0000ff', width: w }
           } );
@@ -239,6 +244,17 @@ function correlation( index ){ //. 初回は index == undefined
       console.log( textStatus + ": " + errorThrown );
     }
   });
+}
+
+function getXY( index, idx, t ){
+  var xy = [];
+  if( index === undefined || idx != index ){
+    xy = [ Math.cos( Math.PI / 2 + idx * t ), Math.sin( Math.PI / 2 + idx * t ) ];
+  }else{
+    xy = [ 0.0, 0.0 ];
+  }
+
+  return xy;
 }
 </script>
 </head>
