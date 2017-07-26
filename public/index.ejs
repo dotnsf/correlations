@@ -116,7 +116,7 @@ function correlation( index ){ //. 初回は index == undefined
     url: './correlation',
     data: postdata,
     success: function( data ){
-      var cp = []; cn = [];
+      var cp = [], cn = [], cpw = [], cnw = [];
       var table = '<tr bgcolor="#ffffcc"><th></th>';
       for( var i = 0; i < shifts.length; i ++ ){
         table += ( '<th>' + ( ( shifts[i] > 0 ) ? '+' : '' ) + shifts[i] + '</th>' );
@@ -136,12 +136,14 @@ function correlation( index ){ //. 初回は index == undefined
             bgcolor = '#ffcccc';
             if( i < j ){
               cp.push( [ i, j ] );
+              cpw.push( Math.round( ( data[i][j] - 0.8 ) * 100 ) );
             }
           }else if( data[i][j] < -0.8 ){
             //. i と j には逆相関関係あり
             bgcolor = '#ccccff';
             if( i < j ){
               cn.push( [ i, j ] );
+              cnw.push( Math.round( ( -0.8 - data[i][j] ) * 100 ) );
             }
           }
           tr += ( '<td bgcolor="' + bgcolor + '">' + data[i][j] + '</td>' );
@@ -188,13 +190,14 @@ function correlation( index ){ //. 初回は index == undefined
           type: 'scatter',
           name: 'Relation Chart',
           text: text,
-          marker: { size: 30, color: '#ff00ff' }
+          marker: { size: 50, color: '#ff00ff' }
         };
 
         var chartdata = [ trace ];
 
         for( var i = 0; i < cp.length; i ++ ){
           var p = cp[i];
+          var w = cpw[i];
           //. p[x] は list[] の何番目に入っているか？
           var i0 = list.indexOf( p[0] );
           var i1 = list.indexOf( p[1] );
@@ -202,26 +205,27 @@ function correlation( index ){ //. 初回は index == undefined
             x: [ Math.cos( Math.PI / 2 + i0 * t ), Math.cos( Math.PI / 2 + i1 * t ) ],
             y: [ Math.sin( Math.PI / 2 + i0 * t ), Math.sin( Math.PI / 2 + i1 * t ) ],
             mode: 'lines',
-            line: { color: '#ff0000' }
+            line: { color: '#ff0000', width: w }
           } );
         }
         for( var i = 0; i < cn.length; i ++ ){
           var p = cn[i];
+          var w = cnw[i];
           var i0 = list.indexOf( p[0] );
           var i1 = list.indexOf( p[1] );
           chartdata.push( {
             x: [ Math.cos( Math.PI / 2 + i0 * t ), Math.cos( Math.PI / 2 + i1 * t ) ],
             y: [ Math.sin( Math.PI / 2 + i0 * t ), Math.sin( Math.PI / 2 + i1 * t ) ],
             mode: 'lines',
-            line: { color: '#0000ff' }
+            line: { color: '#0000ff', width: w }
           } );
         }
 
-console.log( chartdata );
+//console.log( chartdata );
 
         var chartlayout = {
-          xaxis: { range: [ -1.5, 1.5 ] },
-          yaxis: { range: [ -1.5, 1.5 ] },
+          xaxis: { range: [ -1.5, 1.5 ], showgrid: false, zeroline: false, showline: false, autotick: false, showticklabels: false },
+          yaxis: { range: [ -1.5, 1.5 ], showgrid: false, zeroline: false, showline: false, autotick: false, showticklabels: false },
           showlegend: false,
           title: 'Relation Chart'
         };
