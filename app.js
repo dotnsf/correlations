@@ -157,48 +157,6 @@ app.post( '/postcsv', function( req, res ){
         res.write( p );
         res.end();
       }
-
-/*
-        //. 各データの相関関係を調べる
-        var corrs = [];
-        for( var i = 0; i < values.length; i ++ ){
-          var corr = [];
-          for( var j = 0; j < values.length; j ++ ){
-            var c = correlation( values[i], values[j] );
-            corr.push( c );
-          }
-          corrs.push( corr );
-        }
-
-        //. データをずらしてから相関関係を調べる
-        var corrsp = [];
-        var corrss = [];
-        for( var i = 0; i < values.length; i ++ ){
-          var corrp = [];
-          var corrm = [];
-          for( var j = 0; j < values.length; j ++ ){
-            var cp = correlationShift( values[i], values[j], shiftnum );
-            var cm = correlationShift( values[i], values[j], -1 * shiftnum );
-            corrp.push( cp );
-            corrm.push( cm );
-          }
-          corrsp.push( corrp );
-          corrsm.push( corrm );
-        }
-      }
-
-      var chk = check( corrs, threshhold );
-      var chkp = check( corrsp, threshhold );
-      var chkm = check( corrsm, threshhold );
-
-      res.write( JSON.stringify( values, 2, null ) );
-      res.write( JSON.stringify( corrs, 2, null ) );
-      res.write( JSON.stringify( corrsp, 2, null ) );
-      res.write( JSON.stringify( corrsm, 2, null ) );
-      res.write( JSON.stringify( colnames, 2, null ) );
-      res.write( JSON.stringify( rownames, 2, null ) );
-      res.end();
-*/
     });
   }else{
     fs.unlink( path, function( err ){} );
@@ -241,28 +199,9 @@ function check( corrs, t ){
   return r;
 }
 
-function correlationShift( a, b, num ){
-  var n = a.length;
-  var newa = [], newb = [];
-  if( num > 0 ){
-    for( var i = 0; i < n - num; i ++ ){
-      newa.push( a[i] );
-      newb.push( b[i+num] );
-    }
-  }else{
-    for( var i = 0; i < n - num; i ++ ){
-      newa.push( a[i+num] );
-      newb.push( b[i] );
-    }
-  }
-
-  return correlation( newa, newb );
-}
-
 function correlation( a, b ){
   var v = 0.0;
 
-//console.log( 'b = ' + JSON.stringify( b ) );
   if( ( a instanceof Array ) && ( b instanceof Array ) && a.length == b.length ){
     var n = a.length;
 
@@ -272,7 +211,6 @@ function correlation( a, b ){
       avg_a += a[i];
     }
     avg_a /= n;
-//console.log( 'avg_a = ' + avg_a );
 
     //. AVG(b)
     var avg_b = 0.0;
@@ -280,7 +218,6 @@ function correlation( a, b ){
       avg_b += b[i];
     }
     avg_b /= n;
-//console.log( 'avg_b = ' + avg_b );
 
     //. STD(a)
     var std_a = 0.0;
@@ -289,7 +226,6 @@ function correlation( a, b ){
     }
     std_a /= n;  //. VAR(a)
     std_a = Math.sqrt( std_a );
-//console.log( 'std_a = ' + std_a );
 
     //. STD(b)
     var std_b = 0.0;
@@ -298,7 +234,6 @@ function correlation( a, b ){
     }
     std_b /= n;  //. VAR(b)
     std_b = Math.sqrt( std_b );
-//console.log( 'std_b = ' + std_b );
 
     //. COVAR(a,b)
     var covar_ab = 0.0;
@@ -306,12 +241,9 @@ function correlation( a, b ){
       covar_ab += ( a[i] - avg_a ) * ( b[i] - avg_b );
     }
     covar_ab /= n;
-//console.log( 'covar_ab = ' + covar_ab );
 
     //. CORR(a,b)
     v = covar_ab / ( std_a * std_b );
-//console.log( 'v = ' + v );
-//console.log( '' );
   }
 
   return v;
@@ -319,7 +251,8 @@ function correlation( a, b ){
 
 function generateColName( x ){
   var name = "";
-  var acode = "A".charCodeAt( 0 );
+  var A = 'A';
+  var acode = A.charCodeAt( 0 );
 
   //. x を 26 進法で表現する
   var b26 = changeBaseNum( x, 26 );
