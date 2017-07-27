@@ -177,21 +177,23 @@ function correlation( index ){ //. 初回は index == undefined
       if( list.length > 0 ){
         //. 関連チャート
         var t = 2 * Math.PI / list.length;
-        var x = [], y = [], text = [];
+        var x = [], y = [], z = [], text = [];
         for( var i = 0; i < list.length; i ++ ){
           var xy = getXY( index, i, t );
           x.push( xy[0] );
           y.push( xy[1] );
+          z.push( 0.0 );
           text.push( cols[list[i]] );
         }
         var trace = {
           x: x,
           y: y,
+          z: z,
           mode: 'markers',
-          type: 'scatter',
+          type: 'scatter3d',
           name: '',
           text: text,
-          marker: { size: 50, color: '#ff00ff' }
+          marker: { size: 20, color: '#ff00ff' }
         };
 
         var chartdata = [ trace ];
@@ -207,6 +209,8 @@ function correlation( index ){ //. 初回は index == undefined
           chartdata.push( {
             x: [ xy0[0], xy1[0] ],
             y: [ xy0[1], xy1[1] ],
+            z: [ 0.0, 0.0 ],
+            type: 'scatter3d',
             mode: 'lines',
             name: data[p[0]][p[1]],
             line: { color: '#ff0000', width: w }
@@ -222,6 +226,8 @@ function correlation( index ){ //. 初回は index == undefined
           chartdata.push( {
             x: [ xy0[0], xy1[0] ],
             y: [ xy0[1], xy1[1] ],
+            z: [ 0.0, 0.0 ],
+            type: 'scatter3d',
             mode: 'lines',
             name: data[p[0]][p[1]],
             line: { color: '#0000ff', width: w }
@@ -233,6 +239,7 @@ function correlation( index ){ //. 初回は index == undefined
         var chartlayout = {
           xaxis: { range: [ -1.5, 1.5 ], showgrid: false, zeroline: false, showline: false, autotick: false, showticklabels: false },
           yaxis: { range: [ -1.5, 1.5 ], showgrid: false, zeroline: false, showline: false, autotick: false, showticklabels: false },
+          zaxis: { range: [ -1.5, 1.5 ], showgrid: false, zeroline: false, showline: false, autotick: false, showticklabels: false },
           showlegend: false,
           title: 'Relation Map'
         };
