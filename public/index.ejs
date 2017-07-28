@@ -130,7 +130,7 @@ function correlation( index ){ //. 初回は index == undefined
           var bgcolor = '#ffffff';
           if( i == j ){
             bgcolor = '#cccccc';
-            data[i][j] = '-';
+            data[i][j] = '1.0';
           }else if( data[i][j] > 0.8 ){
             //. i と j には相関関係あり
             bgcolor = '#ffcccc';
@@ -193,7 +193,7 @@ function correlation( index ){ //. 初回は index == undefined
           type: 'scatter3d',
           name: '',
           text: text,
-          marker: { size: 20, color: '#ff00ff' }
+          marker: { size: 15, color: '#ff00ff' }
         };
 
         var chartdata = [ trace ];
@@ -237,9 +237,11 @@ function correlation( index ){ //. 初回は index == undefined
 //console.log( chartdata );
 
         var chartlayout = {
-          xaxis: { range: [ -1.5, 1.5 ], showgrid: false, zeroline: false, showline: false, autotick: false, showticklabels: false },
-          yaxis: { range: [ -1.5, 1.5 ], showgrid: false, zeroline: false, showline: false, autotick: false, showticklabels: false },
-          zaxis: { range: [ -1.5, 1.5 ], showgrid: false, zeroline: false, showline: false, autotick: false, showticklabels: false },
+          scene: {  //. https://stackoverflow.com/questions/38489212/plotly-js-3d-scatter-plot-showgrid-false-not-working
+            xaxis: { title: '', range: [ -1.5, 1.5 ], showgrid: false, zeroline: false, showline: false, autotick: false, showticklabels: false, ticks: '' },
+            yaxis: { title: '', range: [ -1.5, 1.5 ], showgrid: false, zeroline: false, showline: false, autotick: false, showticklabels: false, ticks: '' },
+            zaxis: { title: '', range: [ -1.5, 1.5 ], showgrid: false, zeroline: false, showline: false, autotick: false, showticklabels: false, ticks: '' } 
+          },
           showlegend: false,
           title: 'Relation Map'
         };
